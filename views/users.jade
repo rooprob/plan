@@ -1,0 +1,9 @@
+extends layout
+
+block content
+  h1= title
+  p #{title}
+
+  each user in users
+    li
+        a(href="#{user.plan}") #{user.username}
