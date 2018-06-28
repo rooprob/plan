@@ -4,6 +4,6 @@ var router = express.Router();
 var users = require('../controllers/users.js');
 
 /* GET home page. */
-router.get('/', users.findAll) ;
+router.get('/', users.fetchAll) ;
 
 module.exports = router;
