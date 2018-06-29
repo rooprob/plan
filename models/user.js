@@ -10,7 +10,7 @@ module.exports = {
 
   create: function(fields, cb) {
 
-    var r = this.fetchByEmail(fields.email, function(err, user) {
+    var r = this.fetchByEmail(fields.email, [], function(err, user) {
       if (err == false) { // user was found, ie err is false
         return cb(true, {}) ;
       }
@@ -36,7 +36,7 @@ module.exports = {
 
   auth: function(fields, cb) {
     // locate consumer.
-    var r = this.fetchByEmail(fields.email, function(err, user) {
+    var r = this.fetchByEmail(fields.email, [], function(err, user) {
       if (err == true) {
         return cb(err, {}) ;
       }
@@ -53,13 +53,32 @@ module.exports = {
     });
   },
 
-  fetchByEmail: function(email, cb) {
+  fetchById: function(_id, redact, cb) {
+    var r = users.filter(function(e) {
+      return (e._id === _id);
+    });
+    if (r.length == 1) {
+      var user = Object.assign({}, r[0]);
+      console.log(redact);
+      for (var idx = 0; idx < redact.length; idx ++) {
+        delete user[redact[idx]];
+      }
+      return cb(false, user);
+    }
+    // not found
+    return cb(true, {}) ;
+  },
+
+  fetchByEmail: function(email, redact, cb) {
     var r = users.filter(function(e) {
       return (e.email === email);
     });
     if (r.length == 1) {
-      console.log(r[0]);
-      return cb(false, r[0]);
+      var user = Object.assign({}, r[0]);
+      for (var idx = 0; idx < redact.length; idx ++) {
+        delete user[redact[idx]];
+      }
+      return cb(false, user);
     }
     // not found
     return cb(true, {}) ;

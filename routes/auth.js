@@ -1,8 +1,10 @@
 var express = require('express');
 var jwt = require('jsonwebtoken');
 var config = require('../config');
+var verify = require('../middleware/auth');
 
 var router = express.Router();
+
 var User = require('../models/user');
 
 router.post('/register', function(req, res) {
@@ -37,14 +39,12 @@ router.post('/login', function(req, res) {
 		});
 });
 
-router.get('/me', function(req, res) {
-	var token = req.headers['x-access-token'];
-	if (!token) return res.status(401).send({ auth: false, message: 'No token provided.' });
-
-	jwt.verify(token, config.secret, function(err, decoded) {
-		if (err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
-		res.status(200).send(decoded);
-	});
+router.get('/me', verify, function(req, res) {
+  User.fetchById(req.userId, ['password'], function (err, user) {
+    if (err) return res.status(500).send({message: "There was a problem finding the user."});
+    if (!user) return res.status(404).send({message: "No user found."});
+    res.status(200).send(user);
+  });
 });
 
 module.exports = router;
