@@ -53,7 +53,7 @@ module.exports = {
     });
   },
 
-  fetchById: function(_id, redact, cb) {
+  fetchById: function(_id, redact=['password'], cb) {
     var r = users.filter(function(e) {
       return (e._id === _id);
     });
@@ -69,7 +69,7 @@ module.exports = {
     return cb(true, {}) ;
   },
 
-  fetchByEmail: function(email, redact, cb) {
+  fetchByEmail: function(email, redact=['password'], cb) {
     var r = users.filter(function(e) {
       return (e.email === email);
     });
@@ -84,7 +84,15 @@ module.exports = {
     return cb(true, {}) ;
   },
 
-  fetchAll: function(cb) {
-    return users ;
+  fetchAll: function(redact=['password'], cb) {
+    var clean_users = [];
+    for (var idx = 0; idx < users.length; idx ++) {
+      var user = Object.assign({}, users[0]);
+      for (var idx = 0; idx < redact.length; idx ++) {
+        delete user[redact[idx]];
+      }
+      clean_users.push(user);
+    }
+    return clean_users ;
   }
 };
